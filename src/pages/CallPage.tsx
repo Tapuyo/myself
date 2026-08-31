@@ -1,19 +1,19 @@
-import { ConversationProvider, useConversation } from "@elevenlabs/react";
 import { useEffect, useRef, useState } from "react";
 import { headshotUrl } from "../assets/images";
 import { CallCapNotice } from "../components/CallCapNotice";
 import { CallCountdown } from "../components/CallCountdown";
 import { RemainingCallsBadge } from "../components/RemainingCallsBadge";
-import { endCall, getCallStatus, startCall } from "../lib/api";
+import { endCall, getCallStatus, getVoiceReply, startCall, transcribeAudio } from "../lib/api";
 import { useCountdown } from "../lib/useCountdown";
+import { RecordingCancelled, useVoiceRecorder } from "../lib/useVoiceRecorder";
 import profile from "../content/profile.json";
-
-const AGENT_ID = import.meta.env.VITE_ELEVENLABS_AGENT_ID as string | undefined;
 
 type UiState =
   | "idle"
   | "connecting"
-  | "connected"
+  | "listening"
+  | "thinking"
+  | "speaking"
   | "wrapping-up"
   | "ended"
   | "blocked"
@@ -24,7 +24,24 @@ interface TranscriptEntry {
   text: string;
 }
 
-function CallExperience() {
+function playAudio(base64: string, mimeType: string): Promise<void> {
+  return new Promise((resolve) => {
+    const byteChars = atob(base64);
+    const bytes = new Uint8Array(byteChars.length);
+    for (let i = 0; i < byteChars.length; i++) bytes[i] = byteChars.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([bytes], { type: mimeType }));
+    const audio = new Audio(url);
+    const cleanup = () => {
+      URL.revokeObjectURL(url);
+      resolve();
+    };
+    audio.onended = cleanup;
+    audio.onerror = cleanup;
+    audio.play().catch(cleanup);
+  });
+}
+
+export default function CallPage() {
   const [uiState, setUiState] = useState<UiState>("idle");
   const [remainingCalls, setRemainingCalls] = useState<number | null>(null);
   const [statusLoading, setStatusLoading] = useState(true);
@@ -32,67 +49,16 @@ function CallExperience() {
 
   const sessionIdRef = useRef<string | null>(null);
   const transcriptRef = useRef<TranscriptEntry[]>([]);
-  const connectedAtRef = useRef<number | null>(null);
+  const startedAtRef = useRef<number | null>(null);
   const wrappedUpRef = useRef(false);
+  const loopActiveRef = useRef(false);
 
   const { capSeconds } = profile.callWidget;
+  const recorder = useVoiceRecorder();
   const countdown = useCountdown(capSeconds, {
     onExpire: () => {
-      conversation.endSession();
-    },
-  });
-
-  const conversation = useConversation({
-    onConnect: async () => {
-      wrappedUpRef.current = false;
-      transcriptRef.current = [];
-      connectedAtRef.current = Date.now();
-
-      const res = await startCall();
-      if (!res.allowed) {
-        setUiState("blocked");
-        setRemainingCalls(res.remainingCalls);
-        setErrorMessage(res.message ?? "Today's call limit has been reached.");
-        conversation.endSession();
-        return;
-      }
-
-      sessionIdRef.current = res.sessionId ?? null;
-      setRemainingCalls(res.remainingCalls);
-      setUiState("connected");
-      countdown.start();
-    },
-    onMessage: ({ message, role }) => {
-      transcriptRef.current.push({ role, text: message });
-    },
-    onDisconnect: async () => {
-      countdown.stop();
-      if (wrappedUpRef.current || !sessionIdRef.current) {
-        if (uiState !== "blocked") setUiState("idle");
-        return;
-      }
-      wrappedUpRef.current = true;
-      setUiState("wrapping-up");
-
-      const durationSeconds = connectedAtRef.current
-        ? Math.round((Date.now() - connectedAtRef.current) / 1000)
-        : 0;
-
-      try {
-        await endCall({
-          sessionId: sessionIdRef.current,
-          transcript: transcriptRef.current,
-          durationSeconds,
-        });
-      } finally {
-        sessionIdRef.current = null;
-        setUiState("ended");
-        getCallStatus().then((s) => setRemainingCalls(s.remainingCalls));
-      }
-    },
-    onError: (message) => {
-      setErrorMessage(message);
-      setUiState("error");
+      loopActiveRef.current = false;
+      recorder.cancel();
     },
   });
 
@@ -102,24 +68,118 @@ function CallExperience() {
       .finally(() => setStatusLoading(false));
   }, []);
 
+  async function wrapUp() {
+    if (wrappedUpRef.current || !sessionIdRef.current) return;
+    wrappedUpRef.current = true;
+    countdown.stop();
+    setUiState("wrapping-up");
+
+    const durationSeconds = startedAtRef.current
+      ? Math.round((Date.now() - startedAtRef.current) / 1000)
+      : 0;
+
+    try {
+      await endCall({
+        sessionId: sessionIdRef.current,
+        transcript: transcriptRef.current,
+        durationSeconds,
+      });
+    } finally {
+      sessionIdRef.current = null;
+      setUiState("ended");
+      getCallStatus().then((s) => setRemainingCalls(s.remainingCalls));
+    }
+  }
+
+  async function runTurnLoop() {
+    while (loopActiveRef.current) {
+      setUiState("listening");
+      let audioBlob: Blob;
+      try {
+        audioBlob = await recorder.start();
+      } catch (err) {
+        if (err instanceof RecordingCancelled) break;
+        setErrorMessage(err instanceof Error ? err.message : "Couldn't access your microphone.");
+        setUiState("error");
+        loopActiveRef.current = false;
+        break;
+      }
+      if (!loopActiveRef.current) break;
+
+      setUiState("thinking");
+      const { text: userText } = await transcribeAudio(audioBlob);
+      if (!userText?.trim()) continue; // nothing understood, just keep listening
+
+      transcriptRef.current.push({ role: "user", text: userText });
+
+      const reply = await getVoiceReply({
+        sessionId: sessionIdRef.current!,
+        history: transcriptRef.current.slice(0, -1),
+        userText,
+      });
+
+      if (reply.ended) {
+        loopActiveRef.current = false;
+        break;
+      }
+
+      transcriptRef.current.push({ role: "agent", text: reply.text! });
+      setUiState("speaking");
+      await playAudio(reply.audioBase64!, reply.mimeType!);
+      if (!loopActiveRef.current) break;
+    }
+    await wrapUp();
+  }
+
   async function handleStart() {
     setErrorMessage(null);
     setUiState("connecting");
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
-      if (!AGENT_ID) throw new Error("Voice agent is not configured yet.");
-      await conversation.startSession({ agentId: AGENT_ID });
-    } catch (err) {
-      setErrorMessage(
-        err instanceof Error ? err.message : "Couldn't access your microphone.",
-      );
+    } catch {
+      setErrorMessage("Couldn't access your microphone. Please allow mic permission and try again.");
       setUiState("error");
+      return;
     }
+
+    const res = await startCall();
+    if (!res.allowed) {
+      setUiState("blocked");
+      setRemainingCalls(res.remainingCalls);
+      setErrorMessage(res.message ?? "Today's call limit has been reached.");
+      return;
+    }
+
+    sessionIdRef.current = res.sessionId ?? null;
+    transcriptRef.current = [];
+    startedAtRef.current = Date.now();
+    wrappedUpRef.current = false;
+    loopActiveRef.current = true;
+    setRemainingCalls(res.remainingCalls);
+    countdown.start();
+    runTurnLoop();
   }
 
-  const isConnected = uiState === "connected";
+  function handleEndCall() {
+    loopActiveRef.current = false;
+    recorder.cancel();
+  }
+
+  const isActive = ["listening", "thinking", "speaking"].includes(uiState);
   const canStart =
     uiState === "idle" || uiState === "ended" || uiState === "error" || uiState === "blocked";
+
+  const statusText: Record<UiState, string> = {
+    idle: "Your AI Assistant",
+    connecting: "Connecting…",
+    listening: "Listening…",
+    thinking: "Thinking…",
+    speaking: "Speaking…",
+    "wrapping-up": "Wrapping up…",
+    ended: "Call ended",
+    blocked: "Your AI Assistant",
+    error: "Your AI Assistant",
+  };
 
   return (
     <section className="mx-auto max-w-xl px-6 py-16">
@@ -135,17 +195,15 @@ function CallExperience() {
             src={headshotUrl}
             alt={`${profile.meta.name} — AI self avatar`}
             className={`h-36 w-36 rounded-full object-cover ring-4 transition ${
-              isConnected ? "ring-blue-400 animate-pulse" : "ring-blue-50"
+              isActive ? "ring-blue-400 animate-pulse" : "ring-blue-50"
             }`}
           />
         </div>
 
         <p className="text-lg font-semibold text-slate-900">My AI Self</p>
-        <p className="mb-6 text-sm text-slate-500">
-          {isConnected ? "Listening…" : "Your AI Assistant"}
-        </p>
+        <p className="mb-6 text-sm text-slate-500">{statusText[uiState]}</p>
 
-        {isConnected && (
+        {isActive && (
           <div className="mb-6">
             <CallCountdown
               secondsLeft={countdown.secondsLeft}
@@ -165,23 +223,15 @@ function CallExperience() {
             {errorMessage}
           </p>
         )}
-        {uiState === "wrapping-up" && (
-          <p className="mb-4 text-sm text-slate-500">Wrapping up the call…</p>
-        )}
         {uiState === "ended" && (
           <p className="mb-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
             Thanks for calling! I'll follow up if you left any contact info.
           </p>
         )}
-        {!AGENT_ID && (
-          <p className="mb-4 rounded-lg bg-slate-50 px-4 py-3 text-xs text-slate-500">
-            Voice agent isn't configured yet — set VITE_ELEVENLABS_AGENT_ID to enable calls.
-          </p>
-        )}
 
-        {isConnected ? (
+        {isActive ? (
           <button
-            onClick={() => conversation.endSession()}
+            onClick={handleEndCall}
             className="rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
           >
             End Call
@@ -192,18 +242,10 @@ function CallExperience() {
             disabled={!canStart || (remainingCalls !== null && remainingCalls <= 0)}
             className="rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {uiState === "connecting" ? "Connecting…" : "Start Call"}
+            {uiState === "connecting" || uiState === "wrapping-up" ? "Connecting…" : "Start Call"}
           </button>
         )}
       </div>
     </section>
-  );
-}
-
-export default function CallPage() {
-  return (
-    <ConversationProvider>
-      <CallExperience />
-    </ConversationProvider>
   );
 }

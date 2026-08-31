@@ -11,8 +11,6 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.122.0",
-    "@elevenlabs/client": "^1.23.0",
-    "@elevenlabs/react": "^1.15.0",
     "@supabase/supabase-js": "^2.112.4",
     "@tailwindcss/vite": "^4.3.3",
     "react": "^19.2.8",

@@ -25,6 +25,24 @@ export interface ContactPayload {
   company?: string;
 }
 
+export interface TranscribeResponse {
+  text: string;
+}
+
+export interface VoiceRespondPayload {
+  sessionId: string;
+  history: { role: "agent" | "user"; text: string }[];
+  userText: string;
+}
+
+export interface VoiceRespondResponse {
+  ended: boolean;
+  reason?: "not_found" | "time_limit";
+  text?: string;
+  audioBase64?: string;
+  mimeType?: string;
+}
+
 async function asJson<T>(res: Response): Promise<T> {
   const data = await res.json();
   if (!res.ok && res.status !== 429 && res.status !== 400) {
@@ -49,6 +67,22 @@ export function endCall(payload: CallEndPayload): Promise<{ ok: boolean }> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   }).then((res) => asJson<{ ok: boolean }>(res));
+}
+
+export function transcribeAudio(blob: Blob): Promise<TranscribeResponse> {
+  return fetch("/api/voice/transcribe", {
+    method: "POST",
+    headers: { "Content-Type": blob.type || "audio/webm" },
+    body: blob,
+  }).then((res) => asJson<TranscribeResponse>(res));
+}
+
+export function getVoiceReply(payload: VoiceRespondPayload): Promise<VoiceRespondResponse> {
+  return fetch("/api/voice/respond", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  }).then((res) => asJson<VoiceRespondResponse>(res));
 }
 
 export function submitContact(
