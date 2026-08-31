@@ -1,0 +1,249 @@
+{
+  "meta": {
+    "name": "John Paul Tapuyo",
+    "shortName": "John Paul",
+    "title": "AI Systems & Automation Engineer | Senior Flutter & Full-Stack Developer",
+    "location": "Philippines",
+    "email": "johnpaultapuyo@gmail.com",
+    "phone": "+63 960 434 8306",
+    "website": "https://johnpaultapuyo.wixsite.com/bluesclue"
+  },
+  "hero": {
+    "greeting": "Hi, I'm John Paul",
+    "headline": ["You can call me.", "Or call my AI self."],
+    "subcopy": "Can't reach me right now? No worries. Call my AI self to ask about my work, skills, experience, or anything you want to know.",
+    "primaryCta": "Call My AI Self",
+    "secondaryCta": "View My Work"
+  },
+  "summary": "AI Systems & Automation Engineer with 12+ years of software development experience and 7+ years specializing in Flutter and cross-platform applications. Experienced in designing and deploying LLM-powered applications, RAG pipelines, AI agents, and automation workflows using both cloud and local models. Proven ability to build production mobile/web apps, automate business processes, and integrate AI assistants into real-world systems. Strong background in startups, enterprise environments, and end-to-end product delivery.",
+  "stats": [
+    { "label": "Years Experience", "value": "12+" },
+    { "label": "Years in Flutter", "value": "7+" },
+    { "label": "Companies Worked With", "value": "10+" }
+  ],
+  "whatIDo": [
+    {
+      "id": "ai-systems",
+      "title": "AI Systems & LLM Apps",
+      "description": "RAG pipelines, AI agents, and LLM orchestration with LangChain & LangGraph, deployed on cloud and local models."
+    },
+    {
+      "id": "mobile-dev",
+      "title": "Mobile Development",
+      "description": "Cross-platform Flutter apps shipped to the App Store and Google Play, 7+ years of production experience."
+    },
+    {
+      "id": "automation",
+      "title": "Automation & Workflows",
+      "description": "Business process automation with n8n, Make, and Zapier, connected to APIs and internal tools."
+    },
+    {
+      "id": "fullstack",
+      "title": "Full-Stack & Backend",
+      "description": "React, Node.js, Golang, and Python backends with Firebase, Supabase, and AWS integrations."
+    }
+  ],
+  "skillCategories": [
+    {
+      "id": "ai-engineering",
+      "title": "AI Engineering & LLM Systems",
+      "items": [
+        "LLM orchestration using LangChain & LangGraph",
+        "Prompt engineering: zero-shot, one-shot, few-shot, Chain-of-Thought reasoning",
+        "Retrieval-Augmented Generation (RAG): document ingestion, chunking, embedding pipelines, context scoring & reranking",
+        "Vector databases & semantic search: embeddings, similarity search, hybrid retrieval, metadata filtering",
+        "AI agent workflows: multi-step agents, tool usage, LangGraph orchestration vs traditional chains",
+        "Model Context Protocol (MCP): connecting LLMs to external APIs, services, and local tools",
+        "LLM deployment: OpenAI, Gemini, Ollama, Gemma, local open-source models"
+      ]
+    },
+    {
+      "id": "software-engineering",
+      "title": "Software Engineering",
+      "items": [
+        "Flutter, FlutterFlow, React, Python, Golang, Node.js, Laravel, WordPress, PHP",
+        "REST & GraphQL API architecture",
+        "Android & iOS deployment pipelines",
+        "CI/CD: Codemagic, GitHub, GitLab, Vercel, Docker"
+      ]
+    },
+    {
+      "id": "backend-databases",
+      "title": "Backend & Databases",
+      "items": [
+        "Firebase, Supabase, MySQL, SQLite, AWS",
+        "Serverless and cloud integrations",
+        "Authentication, payments, real-time systems"
+      ]
+    },
+    {
+      "id": "automation-iot",
+      "title": "Automation & IoT",
+      "items": [
+        "n8n workflow automation, Make, Zapier",
+        "Arduino, ESP32, sensor integrations",
+        "AI-driven internal tools & business automation"
+      ]
+    }
+  ],
+  "tools": [
+    "VSCode", "Android Studio", "Xcode", "Antigravity", "Claude Code", "Cursor",
+    "Git", "Copilot", "Arduino IDE", "Figma", "Adobe XD", "Photoshop", "Canva"
+  ],
+  "techStack": [
+    "Flutter", "Dart", "React", "Next.js", "Node.js", "Python", "Golang",
+    "LangChain", "Supabase", "PostgreSQL", "Tailwind CSS", "Firebase"
+  ],
+  "experience": [
+    {
+      "company": "Ayowa Inc",
+      "role": "Full Stack Developer",
+      "period": "Jan 2026 – Present",
+      "projects": ["Ayowa app"],
+      "tech": ["Flutter", "NestJS", "Docker", "Next.js", "CockroachDB"],
+      "highlights": [
+        "Created secured API endpoints",
+        "Integrated backend SDKs, including payment providers",
+        "Built mobile and web apps from scratch using clean architecture",
+        "Implemented authentication, APIs, and email systems",
+        "Managed Apple & Google developer accounts and releases"
+      ]
+    },
+    {
+      "company": "Skyshare Labs Inc",
+      "role": "Senior Web & Mobile Developer / AI Engineer",
+      "period": "Jun 2025 – Dec 2025",
+      "projects": ["Zion IMS", "Avian Summit", "Awesome Smile"],
+      "tech": ["Flutter", "Python", "OpenAI", "n8n", "LLMs"],
+      "highlights": [
+        "Designed and deployed RAG-powered AI assistants for business workflows and knowledge systems",
+        "Built multi-step AI agents connected to APIs and automation tools",
+        "Implemented prompt engineering and reasoning workflows for production use",
+        "Developed cross-platform mobile and web apps using Flutter",
+        "Architected databases, state management, and CI/CD pipelines",
+        "Launched apps on Web, Google Play, and Apple App Store",
+        "Built end-to-end automation workflows using n8n"
+      ]
+    },
+    {
+      "company": "Innovative Global Entities",
+      "role": "Full-Stack & AI Developer",
+      "period": "Jan 2025 – May 2025",
+      "projects": ["Innovative Website", "BizCredit", "Sales Flow"],
+      "tech": ["Flutter", "Golang", "NestJS", "React", "Next.js", "Shopify", "LLMs", "Twilio", "LangChain"],
+      "highlights": [
+        "Developed and maintained production mobile apps and backend systems",
+        "Built and deployed server-side AI assistants integrated into chat platforms",
+        "Integrated third-party APIs, payments, and automation workflows",
+        "Participated in sprint planning, branching strategies, and CI pipelines"
+      ]
+    },
+    {
+      "company": "GECO PH / Unilab PH",
+      "role": "Flutter Developer",
+      "period": "Aug 2024 – Dec 2024",
+      "projects": ["Pharma App", "RiteMed", "Alerta"],
+      "tech": ["Flutter", "Unity", "Python", "AWS"],
+      "highlights": [
+        "Delivered enterprise Flutter features based on sprint tickets",
+        "Managed deployment and release cycles",
+        "Collaborated with clients and stakeholders in production environments"
+      ]
+    },
+    {
+      "company": "Prodigy Works",
+      "role": "Full-Stack Developer",
+      "period": "Oct 2023 – Jun 2024",
+      "projects": ["Examathleet", "Knot Dating", "St Lukes Medical HR App"],
+      "tech": ["Flutter", "Go", "React", "Firebase", "Supabase"],
+      "highlights": [
+        "Built mobile and web apps from scratch using clean architecture",
+        "Implemented authentication, APIs, and email systems",
+        "Managed Apple & Google developer accounts and releases"
+      ]
+    },
+    {
+      "company": "Theoria Medical Institute (US)",
+      "role": "Senior Flutter Developer",
+      "period": "Dec 2021 – Oct 2023",
+      "projects": ["CharEasy"],
+      "tech": ["Flutter", "GraphQL", "Firebase"],
+      "highlights": [
+        "Led feature development and code quality reviews",
+        "Mentored junior developers and enforced best practices",
+        "Implemented CI/CD pipelines and TestFlight deployments"
+      ]
+    },
+    {
+      "company": "New Driver Programme (UK)",
+      "role": "Senior Full-Stack Developer",
+      "period": "Dec 2020 – Dec 2021",
+      "projects": ["Driving Lesson Route", "NDP Website"],
+      "tech": ["React", "Flutter", "Firebase", "Google Cloud", "WordPress", "Node.js"],
+      "highlights": [
+        "Architected mobile apps and Firebase backend",
+        "Integrated mapping solutions (Mapbox, HERE Maps)",
+        "Supported WordPress and BuddyBoss web systems"
+      ]
+    },
+    {
+      "company": "Leepe Inc",
+      "role": "Senior Full-Stack Developer / Team Lead",
+      "period": "Mar 2020 – Nov 2020",
+      "projects": ["DrinkLink", "Vibelynx"],
+      "tech": ["Flutter", "ReactJs", "NestJs", "Supabase", "Firebase", "Django"],
+      "highlights": [
+        "Led development team and conducted code reviews",
+        "Managed client meetings and technical planning",
+        "Supervised deployments and releases"
+      ]
+    },
+    {
+      "company": "Eco Access Solution",
+      "role": "IT Head",
+      "period": "Nov 2019 – Mar 2020",
+      "highlights": ["Developed internal systems and employee monitoring tools"]
+    },
+    {
+      "company": "Bohol Island State University",
+      "role": "IT Head / Programmer",
+      "period": "Jul 2018 – Jun 2019",
+      "highlights": [
+        "Built IoT automation systems using sensors",
+        "Developed desktop apps for data visualization"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "title": "Local AI Business Assistant",
+      "description": "Built a local LLM assistant using Ollama, integrated with Telegram and business workflows. Implemented a knowledge-based RAG system for business operations."
+    },
+    {
+      "title": "AI Chat Automation Systems",
+      "description": "Developed AI chat tools connected to APIs and internal automation workflows."
+    },
+    {
+      "title": "IoT + Mobile Integration Projects",
+      "description": "Oil Engine Quality Tester (ESP32 + Flutter Bluetooth app) and a smart irrigation system using Arduino and soil sensors."
+    }
+  ],
+  "education": [
+    {
+      "school": "Bohol Island State University",
+      "degree": "Bachelor of Science in Computer Science",
+      "period": "2012–2018"
+    }
+  ],
+  "areasOfExpertise": [
+    "AI Systems & LLM Applications", "AI Agents", "RAG Pipelines", "Automation",
+    "Mobile Development", "Web Development", "Backend Systems", "IoT", "UI/UX"
+  ],
+  "callWidget": {
+    "readyStatusText": "AI Self is ready to talk",
+    "privacyNotice": "Calls are transcribed and summarized to help me follow up with you.",
+    "capSeconds": 180,
+    "capLabel": "Calls are limited to 3 minutes.",
+    "maxCallsPerDay": 2
+  }
+}
