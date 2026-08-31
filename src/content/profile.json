@@ -225,6 +225,14 @@
     {
       "title": "IoT + Mobile Integration Projects",
       "description": "Oil Engine Quality Tester (ESP32 + Flutter Bluetooth app) and a smart irrigation system using Arduino and soil sensors."
+    },
+    {
+      "title": "Bionatural Products Website",
+      "description": "Marketing website for Bionatural Products Inc., a virgin coconut oil brand based in Bilar, Bohol — product showcase, brand story, and health-benefits content. Built with Next.js and TypeScript, deployed on Vercel."
+    },
+    {
+      "title": "LeadRadar",
+      "description": "A lead-tracking and CRM tool for managing sales leads and customer inquiries. Built with Next.js and TypeScript."
     }
   ],
   "education": [
