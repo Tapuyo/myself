@@ -54,7 +54,7 @@
         "Vector databases & semantic search: embeddings, similarity search, hybrid retrieval, metadata filtering",
         "AI agent workflows: multi-step agents, tool usage, LangGraph orchestration vs traditional chains",
         "Model Context Protocol (MCP): connecting LLMs to external APIs, services, and local tools",
-        "LLM deployment: OpenAI, Gemini, Ollama, Gemma, local open-source models"
+        "LLM deployment: Claude, OpenAI, Gemini, Ollama, Gemma, local open-source models"
       ]
     },
     {
