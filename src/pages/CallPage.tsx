@@ -24,62 +24,20 @@ interface TranscriptEntry {
   text: string;
 }
 
-function playAudio(base64: string, mimeType: string, onLevel: (level: number) => void): Promise<void> {
+function playAudio(base64: string, mimeType: string): Promise<void> {
   return new Promise((resolve) => {
     const byteChars = atob(base64);
     const bytes = new Uint8Array(byteChars.length);
     for (let i = 0; i < byteChars.length; i++) bytes[i] = byteChars.charCodeAt(i);
     const url = URL.createObjectURL(new Blob([bytes], { type: mimeType }));
     const audio = new Audio(url);
-
-    let audioCtx: AudioContext | null = null;
-    let rafId: number | null = null;
-
     const cleanup = () => {
-      if (rafId !== null) cancelAnimationFrame(rafId);
-      audioCtx?.close().catch(() => {});
-      onLevel(0);
       URL.revokeObjectURL(url);
       resolve();
     };
-
     audio.onended = cleanup;
     audio.onerror = cleanup;
-
-    audio
-      .play()
-      .then(() => {
-        try {
-          audioCtx = new AudioContext();
-          const source = audioCtx.createMediaElementSource(audio);
-          const analyser = audioCtx.createAnalyser();
-          analyser.fftSize = 1024;
-          source.connect(analyser);
-          analyser.connect(audioCtx.destination); // must reach destination or playback goes silent
-          const data = new Uint8Array(analyser.fftSize);
-          let lastUpdate = 0;
-
-          const tick = () => {
-            analyser.getByteTimeDomainData(data);
-            let sumSquares = 0;
-            for (let i = 0; i < data.length; i++) {
-              const v = data[i] - 128;
-              sumSquares += v * v;
-            }
-            const rms = Math.sqrt(sumSquares / data.length);
-            const now = Date.now();
-            if (now - lastUpdate >= 100) {
-              lastUpdate = now;
-              onLevel(Math.min(1, rms / 40));
-            }
-            rafId = requestAnimationFrame(tick);
-          };
-          rafId = requestAnimationFrame(tick);
-        } catch {
-          // Analyser is a visual nicety — if it fails for any reason, audio still plays fine.
-        }
-      })
-      .catch(cleanup);
+    audio.play().catch(cleanup);
   });
 }
 
@@ -88,7 +46,6 @@ export default function CallPage() {
   const [remainingCalls, setRemainingCalls] = useState<number | null>(null);
   const [statusLoading, setStatusLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [speakingLevel, setSpeakingLevel] = useState(0);
 
   const sessionIdRef = useRef<string | null>(null);
   const transcriptRef = useRef<TranscriptEntry[]>([]);
@@ -161,7 +118,7 @@ export default function CallPage() {
       transcriptRef.current.push({ role: "user", text: reply.userText });
       transcriptRef.current.push({ role: "agent", text: reply.text! });
       setUiState("speaking");
-      await playAudio(reply.audioBase64!, reply.mimeType!, setSpeakingLevel);
+      await playAudio(reply.audioBase64!, reply.mimeType!);
       if (!loopActiveRef.current) break;
     }
     await wrapUp();
@@ -246,17 +203,6 @@ export default function CallPage() {
               uiState === "thinking" ? "animate-breathe" : ""
             }`}
           />
-
-          {uiState === "speaking" && (
-            <span
-              className="absolute left-1/2 top-[57%] -translate-x-1/2 rounded-full bg-slate-900/70"
-              style={{
-                width: "14%",
-                height: `${3 + speakingLevel * 10}%`,
-                transition: "height 100ms ease-out",
-              }}
-            />
-          )}
 
           {uiState === "listening" && (
             <span className="absolute -bottom-1 -right-1 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md">
