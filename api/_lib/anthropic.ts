@@ -11,4 +11,5 @@ export function getAnthropic(): Anthropic {
 }
 
 export const SUMMARY_MODEL = "claude-sonnet-4-5";
-export const BRAIN_MODEL = "claude-sonnet-4-5";
+/** Faster model for live voice turns, where generation latency matters most. */
+export const LIVE_REPLY_MODEL = "claude-haiku-4-5-20251001";

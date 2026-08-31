@@ -1,6 +1,6 @@
 const ELEVENLABS_BASE_URL = "https://api.elevenlabs.io";
 const STT_MODEL_ID = "scribe_v2";
-const TTS_MODEL_ID = "eleven_multilingual_v2";
+const TTS_MODEL_ID = "eleven_flash_v2_5";
 
 function getApiKey(): string {
   const key = process.env.ELEVENLABS_API_KEY;

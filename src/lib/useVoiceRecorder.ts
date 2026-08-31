@@ -21,7 +21,7 @@ export class RecordingCancelled extends Error {
 /** Records mic audio, auto-stopping after a pause in speech. */
 export function useVoiceRecorder({
   silenceThreshold = 12,
-  silenceDurationMs = 1300,
+  silenceDurationMs = 900,
   minRecordingMs = 400,
   maxRecordingMs = 20000,
 }: UseVoiceRecorderOptions = {}) {

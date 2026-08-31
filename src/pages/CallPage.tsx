@@ -3,7 +3,7 @@ import { headshotUrl } from "../assets/images";
 import { CallCapNotice } from "../components/CallCapNotice";
 import { CallCountdown } from "../components/CallCountdown";
 import { RemainingCallsBadge } from "../components/RemainingCallsBadge";
-import { endCall, getCallStatus, getVoiceReply, startCall, transcribeAudio } from "../lib/api";
+import { endCall, getCallStatus, sendVoiceTurn, startCall } from "../lib/api";
 import { useCountdown } from "../lib/useCountdown";
 import { RecordingCancelled, useVoiceRecorder } from "../lib/useVoiceRecorder";
 import profile from "../content/profile.json";
@@ -107,22 +107,15 @@ export default function CallPage() {
       if (!loopActiveRef.current) break;
 
       setUiState("thinking");
-      const { text: userText } = await transcribeAudio(audioBlob);
-      if (!userText?.trim()) continue; // nothing understood, just keep listening
-
-      transcriptRef.current.push({ role: "user", text: userText });
-
-      const reply = await getVoiceReply({
-        sessionId: sessionIdRef.current!,
-        history: transcriptRef.current.slice(0, -1),
-        userText,
-      });
+      const reply = await sendVoiceTurn(sessionIdRef.current!, transcriptRef.current, audioBlob);
 
       if (reply.ended) {
         loopActiveRef.current = false;
         break;
       }
+      if (!reply.userText?.trim()) continue; // nothing understood, just keep listening
 
+      transcriptRef.current.push({ role: "user", text: reply.userText });
       transcriptRef.current.push({ role: "agent", text: reply.text! });
       setUiState("speaking");
       await playAudio(reply.audioBase64!, reply.mimeType!);

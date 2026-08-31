@@ -25,22 +25,25 @@ export interface ContactPayload {
   company?: string;
 }
 
-export interface TranscribeResponse {
+export interface TranscriptEntry {
+  role: "agent" | "user";
   text: string;
 }
 
-export interface VoiceRespondPayload {
-  sessionId: string;
-  history: { role: "agent" | "user"; text: string }[];
-  userText: string;
-}
-
-export interface VoiceRespondResponse {
+export interface VoiceTurnResponse {
   ended: boolean;
   reason?: "not_found" | "time_limit";
+  userText?: string;
   text?: string;
   audioBase64?: string;
   mimeType?: string;
+}
+
+function utf8ToBase64(str: string): string {
+  const bytes = new TextEncoder().encode(str);
+  let binary = "";
+  bytes.forEach((b) => (binary += String.fromCharCode(b)));
+  return btoa(binary);
 }
 
 async function asJson<T>(res: Response): Promise<T> {
@@ -69,20 +72,20 @@ export function endCall(payload: CallEndPayload): Promise<{ ok: boolean }> {
   }).then((res) => asJson<{ ok: boolean }>(res));
 }
 
-export function transcribeAudio(blob: Blob): Promise<TranscribeResponse> {
-  return fetch("/api/voice/transcribe", {
+export function sendVoiceTurn(
+  sessionId: string,
+  history: TranscriptEntry[],
+  audioBlob: Blob,
+): Promise<VoiceTurnResponse> {
+  return fetch("/api/voice/turn", {
     method: "POST",
-    headers: { "Content-Type": blob.type || "audio/webm" },
-    body: blob,
-  }).then((res) => asJson<TranscribeResponse>(res));
-}
-
-export function getVoiceReply(payload: VoiceRespondPayload): Promise<VoiceRespondResponse> {
-  return fetch("/api/voice/respond", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  }).then((res) => asJson<VoiceRespondResponse>(res));
+    headers: {
+      "Content-Type": audioBlob.type || "audio/webm",
+      "X-Session-Id": sessionId,
+      "X-History": utf8ToBase64(JSON.stringify(history)),
+    },
+    body: audioBlob,
+  }).then((res) => asJson<VoiceTurnResponse>(res));
 }
 
 export function submitContact(

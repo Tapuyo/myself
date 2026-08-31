@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { getSupabaseAdmin } from "../_lib/supabaseAdmin.js";
-import { getAnthropic, BRAIN_MODEL } from "../_lib/anthropic.js";
-import { synthesizeSpeech } from "../_lib/elevenlabsVoice.js";
+import { getAnthropic, LIVE_REPLY_MODEL } from "../_lib/anthropic.js";
+import { synthesizeSpeech, transcribeAudio } from "../_lib/elevenlabsVoice.js";
 import { buildSystemPrompt, profile } from "../_lib/profile.js";
 
 interface TranscriptEntry {
@@ -9,10 +9,23 @@ interface TranscriptEntry {
   text: string;
 }
 
-interface RespondBody {
-  sessionId?: string;
-  history?: TranscriptEntry[];
-  userText?: string;
+async function readRawBody(req: VercelRequest): Promise<Buffer> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+  return Buffer.concat(chunks);
+}
+
+function readHistoryHeader(req: VercelRequest): TranscriptEntry[] {
+  const header = req.headers["x-history"];
+  const value = Array.isArray(header) ? header[0] : header;
+  if (!value) return [];
+  try {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  } catch {
+    return [];
+  }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -21,14 +34,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  const { sessionId, history = [], userText }: RespondBody = req.body ?? {};
+  const sessionIdHeader = req.headers["x-session-id"];
+  const sessionId = Array.isArray(sessionIdHeader) ? sessionIdHeader[0] : sessionIdHeader;
 
-  if (!sessionId || !userText) {
-    res.status(400).json({ message: "sessionId and userText are required." });
+  if (!sessionId) {
+    res.status(400).json({ message: "X-Session-Id header is required." });
     return;
   }
 
   try {
+    const audioBuffer = Buffer.isBuffer(req.body) ? req.body : await readRawBody(req);
+    if (audioBuffer.length === 0) {
+      res.status(400).json({ message: "No audio data received." });
+      return;
+    }
+
+    const mimeType = req.headers["content-type"] || "audio/webm";
+    const userText = await transcribeAudio(audioBuffer, mimeType);
+
+    if (!userText?.trim()) {
+      res.status(200).json({ ended: false, userText: "" });
+      return;
+    }
+
     const supabase = getSupabaseAdmin();
     const { data: session, error: fetchError } = await supabase
       .from("call_sessions")
@@ -49,9 +77,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
+    const history = readHistoryHeader(req);
+
     const message = await getAnthropic().messages.create({
-      model: BRAIN_MODEL,
-      max_tokens: 1024,
+      model: LIVE_REPLY_MODEL,
+      max_tokens: 300,
       system: buildSystemPrompt(),
       messages: [
         ...history.map((h) => ({
@@ -67,16 +97,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .map((b) => (b.type === "text" ? b.text : ""))
       .join("");
 
-    const audioBuffer = await synthesizeSpeech(replyText);
+    const audioReply = await synthesizeSpeech(replyText);
 
     res.status(200).json({
       ended: false,
+      userText,
       text: replyText,
-      audioBase64: audioBuffer.toString("base64"),
+      audioBase64: audioReply.toString("base64"),
       mimeType: "audio/mpeg",
     });
   } catch (err) {
-    console.error("[voice/respond]", err);
-    res.status(500).json({ message: "Could not generate a reply." });
+    console.error("[voice/turn]", err);
+    res.status(500).json({ message: "Could not process the voice turn." });
   }
 }
