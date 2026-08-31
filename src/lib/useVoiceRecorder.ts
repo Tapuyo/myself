@@ -21,11 +21,12 @@ export class RecordingCancelled extends Error {
 /** Records mic audio, auto-stopping after a pause in speech. */
 export function useVoiceRecorder({
   silenceThreshold = 12,
-  silenceDurationMs = 900,
+  silenceDurationMs = 1400,
   minRecordingMs = 400,
-  maxRecordingMs = 20000,
+  maxRecordingMs = 60000,
 }: UseVoiceRecorderOptions = {}) {
   const [listening, setListening] = useState(false);
+  const [level, setLevel] = useState(0);
   const cleanupRef = useRef<(() => void) | null>(null);
 
   const start = useCallback((): Promise<Blob> => {
@@ -40,6 +41,7 @@ export function useVoiceRecorder({
         stream?.getTracks().forEach((t) => t.stop());
         audioCtx?.close().catch(() => {});
         setListening(false);
+        setLevel(0);
         cleanupRef.current = null;
       };
 
@@ -70,6 +72,7 @@ export function useVoiceRecorder({
 
           const startTime = Date.now();
           let silenceStart: number | null = null;
+          let lastLevelUpdate = 0;
 
           const tick = () => {
             analyser.getByteTimeDomainData(data);
@@ -79,7 +82,15 @@ export function useVoiceRecorder({
               sumSquares += v * v;
             }
             const rms = Math.sqrt(sumSquares / data.length);
-            const elapsed = Date.now() - startTime;
+            const now = Date.now();
+            const elapsed = now - startTime;
+
+            // Throttle React state updates to ~10/sec — smooth enough for a
+            // visual meter without flooding re-renders at animation-frame rate.
+            if (now - lastLevelUpdate >= 100) {
+              lastLevelUpdate = now;
+              setLevel(Math.min(1, rms / 50));
+            }
 
             if (elapsed >= maxRecordingMs) {
               recorder.stop();
@@ -121,5 +132,5 @@ export function useVoiceRecorder({
     cleanupRef.current?.();
   }, []);
 
-  return { start, cancel, listening };
+  return { start, cancel, listening, level };
 }

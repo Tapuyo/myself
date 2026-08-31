@@ -165,13 +165,25 @@ export default function CallPage() {
   const statusText: Record<UiState, string> = {
     idle: "Your AI Assistant",
     connecting: "Connecting…",
-    listening: "Listening…",
+    listening: "Listening — go ahead, I'm picking up your voice",
     thinking: "Thinking…",
     speaking: "Speaking…",
     "wrapping-up": "Wrapping up…",
     ended: "Call ended",
     blocked: "Your AI Assistant",
     error: "Your AI Assistant",
+  };
+
+  const ringClass: Record<UiState, string> = {
+    idle: "ring-blue-50",
+    connecting: "ring-blue-50",
+    listening: "ring-emerald-400 animate-pulse",
+    thinking: "ring-amber-400",
+    speaking: "ring-blue-400 animate-pulse",
+    "wrapping-up": "ring-blue-50",
+    ended: "ring-blue-50",
+    blocked: "ring-blue-50",
+    error: "ring-blue-50",
   };
 
   return (
@@ -187,14 +199,50 @@ export default function CallPage() {
           <img
             src={headshotUrl}
             alt={`${profile.meta.name} — AI self avatar`}
-            className={`h-36 w-36 rounded-full object-cover ring-4 transition ${
-              isActive ? "ring-blue-400 animate-pulse" : "ring-blue-50"
-            }`}
+            className={`h-36 w-36 rounded-full object-cover ring-4 transition ${ringClass[uiState]}`}
           />
+
+          {uiState === "listening" && (
+            <span className="absolute -bottom-1 -right-1 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md">
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 14a3 3 0 003-3V6a3 3 0 10-6 0v5a3 3 0 003 3z" />
+                <path d="M17 11a1 1 0 10-2 0 3 3 0 01-6 0 1 1 0 10-2 0 5 5 0 004 4.9V18H9a1 1 0 100 2h6a1 1 0 100-2h-2v-2.1a5 5 0 004-4.9z" />
+              </svg>
+            </span>
+          )}
+          {uiState === "thinking" && (
+            <span className="absolute -bottom-1 -right-1 flex h-10 w-10 items-center justify-center rounded-full bg-amber-500 text-white shadow-md">
+              <span className="flex gap-0.5">
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white [animation-delay:-0.3s]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white [animation-delay:-0.15s]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white" />
+              </span>
+            </span>
+          )}
+          {uiState === "speaking" && (
+            <span className="absolute -bottom-1 -right-1 flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white shadow-md">
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M11 5 6 9H3v6h3l5 4V5z" />
+                <path d="M15.5 8.5a5 5 0 010 7M18 6a9 9 0 010 12" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+              </svg>
+            </span>
+          )}
         </div>
 
         <p className="text-lg font-semibold text-slate-900">My AI Self</p>
-        <p className="mb-6 text-sm text-slate-500">{statusText[uiState]}</p>
+        <p className="mb-3 text-sm text-slate-500">{statusText[uiState]}</p>
+
+        {uiState === "listening" && (
+          <div className="mb-3 flex h-6 items-end justify-center gap-1">
+            {[0.5, 0.8, 1, 0.8, 0.5].map((mult, i) => (
+              <span
+                key={i}
+                className="w-1.5 rounded-full bg-emerald-500 transition-all duration-100"
+                style={{ height: `${Math.max(15, recorder.level * mult * 100)}%` }}
+              />
+            ))}
+          </div>
+        )}
 
         {isActive && (
           <div className="mb-6">
