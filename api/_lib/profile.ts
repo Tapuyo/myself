@@ -1,5 +1,5 @@
-import profile from "../../src/content/profile.json";
-import type { Profile } from "../../src/content/profile.types";
+import profile from "../../src/content/profile.json" with { type: "json" };
+import type { Profile } from "../../src/content/profile.types.js";
 
 const typedProfile = profile as Profile;
 

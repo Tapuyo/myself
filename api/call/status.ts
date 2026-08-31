@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getSupabaseAdmin } from "../_lib/supabaseAdmin";
-import { getClientIp, hashIp } from "../_lib/ipHash";
-import { profile } from "../_lib/profile";
+import { getSupabaseAdmin } from "../_lib/supabaseAdmin.js";
+import { getClientIp, hashIp } from "../_lib/ipHash.js";
+import { profile } from "../_lib/profile.js";
 
 const DAY_TZ = "Asia/Manila";
 

@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getSupabaseAdmin } from "./_lib/supabaseAdmin";
+import { getSupabaseAdmin } from "./_lib/supabaseAdmin.js";
 
 interface ContactBody {
   name?: string;

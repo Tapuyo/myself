@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getSupabaseAdmin } from "../_lib/supabaseAdmin";
-import { getAnthropic, SUMMARY_MODEL } from "../_lib/anthropic";
+import { getSupabaseAdmin } from "../_lib/supabaseAdmin.js";
+import { getAnthropic, SUMMARY_MODEL } from "../_lib/anthropic.js";
 
 interface TranscriptEntry {
   role: "agent" | "user";

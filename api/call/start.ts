@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getSupabaseAdmin } from "../_lib/supabaseAdmin";
-import { getClientIp, hashIp } from "../_lib/ipHash";
-import { profile } from "../_lib/profile";
-import { countTodaysCalls } from "./status";
+import { getSupabaseAdmin } from "../_lib/supabaseAdmin.js";
+import { getClientIp, hashIp } from "../_lib/ipHash.js";
+import { profile } from "../_lib/profile.js";
+import { countTodaysCalls } from "./status.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {

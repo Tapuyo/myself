@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getAnthropic, BRAIN_MODEL } from "../../_lib/anthropic";
-import { buildSystemPrompt } from "../../_lib/profile";
+import { getAnthropic, BRAIN_MODEL } from "../../_lib/anthropic.js";
+import { buildSystemPrompt } from "../../_lib/profile.js";
 
 interface OpenAiMessage {
   role: "system" | "user" | "assistant";
