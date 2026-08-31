@@ -1,7 +1,7 @@
 {
   "meta": {
     "name": "John Paul Tapuyo",
-    "shortName": "John Paul",
+    "shortName": "John Taps",
     "title": "AI Systems & Automation Engineer | Senior Flutter & Full-Stack Developer",
     "location": "Philippines",
     "email": "johnpaultapuyo@gmail.com",
@@ -9,7 +9,7 @@
     "website": "https://johnpaultapuyo.wixsite.com/bluesclue"
   },
   "hero": {
-    "greeting": "Hi, I'm John Paul",
+    "greeting": "Hi, I'm John Taps",
     "headline": ["You can call me.", "Or call my AI self."],
     "subcopy": "Can't reach me right now? No worries. Call my AI self to ask about my work, skills, experience, or anything you want to know.",
     "primaryCta": "Call My AI Self",
@@ -215,8 +215,8 @@
   ],
   "projects": [
     {
-      "title": "Local AI Business Assistant",
-      "description": "Built a local LLM assistant using Ollama, integrated with Telegram and business workflows. Implemented a knowledge-based RAG system for business operations."
+      "title": "AI Business Assistant",
+      "description": "Built an LLM-powered business assistant using Claude, OpenAI, and local models via Ollama, integrated with Telegram and business workflows. Implemented a knowledge-based RAG system for business operations."
     },
     {
       "title": "AI Chat Automation Systems",
