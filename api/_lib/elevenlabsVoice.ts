@@ -14,7 +14,7 @@ function getVoiceId(): string {
 
 export async function transcribeAudio(audioBuffer: Buffer, mimeType: string): Promise<string> {
   const form = new FormData();
-  form.append("file", new Blob([audioBuffer], { type: mimeType }), "recording.webm");
+  form.append("file", new Blob([new Uint8Array(audioBuffer)], { type: mimeType }), "recording.webm");
   form.append("model_id", STT_MODEL_ID);
 
   const res = await fetch(`${ELEVENLABS_BASE_URL}/v1/speech-to-text`, {
