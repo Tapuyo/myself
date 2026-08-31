@@ -98,15 +98,14 @@
     {
       "company": "Ayowa Inc",
       "role": "Full Stack Developer",
-      "period": "Jan 2026 – Present",
+      "period": "Jan 2026 – Aug 2026",
       "projects": ["Ayowa app"],
-      "tech": ["Flutter", "NestJS", "Docker", "Next.js", "CockroachDB"],
+      "tech": ["Node.js", "Docker", "CockroachDB", "Bictorys Payment", "Firebase", "Supabase", "Qencode"],
       "highlights": [
         "Created secured API endpoints",
         "Integrated backend SDKs, including payment providers",
-        "Built mobile and web apps from scratch using clean architecture",
-        "Implemented authentication, APIs, and email systems",
-        "Managed Apple & Google developer accounts and releases"
+        "Integrated live streaming with Qencode",
+        "Implemented authentication, APIs, and email systems"
       ]
     },
     {
