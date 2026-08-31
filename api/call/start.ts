@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.status(429).json({
         allowed: false,
         remainingCalls: 0,
-        message: "You've reached today's limit of 2 calls. Please come back tomorrow.",
+        message: `You've reached today's limit of ${maxCalls} calls. Please come back tomorrow.`,
       });
       return;
     }

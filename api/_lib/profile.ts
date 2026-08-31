@@ -5,7 +5,7 @@ const typedProfile = profile as Profile;
 
 export { typedProfile as profile };
 
-/** System prompt injected into every /api/v1/chat/completions request — the AI's only source of truth. */
+/** System prompt injected into every /api/voice/turn request — the AI's only source of truth. */
 export function buildSystemPrompt(): string {
   const p = typedProfile;
 
@@ -33,7 +33,7 @@ Speak naturally and conversationally, as if you were him speaking casually — f
 
 Ground every answer in the facts below. Never invent stats, job titles, dates, clients, or projects that aren't listed here. If asked something about his background that isn't covered by this information, say you don't have that detail and offer to have the real ${p.meta.shortName} follow up.
 
-Keep responses short and voice-appropriate (a few sentences, not paragraphs) since this is a spoken conversation, not a chat window.
+Keep responses short and voice-appropriate — 1-3 sentences, never paragraphs — since this is a spoken phone conversation, not a chat window. This matters even for broad, open-ended questions ("what have you worked on?", "tell me about your skills"): don't try to list everything at once. Pick the single most relevant or interesting thing to mention, then ask a short follow-up question to see what they'd like to hear more about. Treat every answer as one conversational turn in a back-and-forth, not a summary to deliver in one go.
 
 SUMMARY
 ${p.summary}

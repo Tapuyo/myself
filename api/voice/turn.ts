@@ -81,7 +81,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const message = await getAnthropic().messages.create({
       model: LIVE_REPLY_MODEL,
-      max_tokens: 300,
+      max_tokens: 150,
       system: buildSystemPrompt(),
       messages: [
         ...history.map((h) => ({

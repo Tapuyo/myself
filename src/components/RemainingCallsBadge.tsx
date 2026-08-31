@@ -25,7 +25,7 @@ export function RemainingCallsBadge({ remainingCalls, loading }: Props) {
       }`}
     >
       {usedUp
-        ? "You've used today's 2 calls — come back tomorrow"
+        ? `You've used today's ${max} calls — come back tomorrow`
         : `${remainingCalls} of ${max} calls left today`}
     </span>
   );

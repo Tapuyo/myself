@@ -242,8 +242,8 @@
   "callWidget": {
     "readyStatusText": "AI Self is ready to talk",
     "privacyNotice": "Calls are transcribed and summarized to help me follow up with you.",
-    "capSeconds": 180,
-    "capLabel": "Calls are limited to 3 minutes.",
-    "maxCallsPerDay": 2
+    "capSeconds": 300,
+    "capLabel": "Calls are limited to 5 minutes.",
+    "maxCallsPerDay": 3
   }
 }
